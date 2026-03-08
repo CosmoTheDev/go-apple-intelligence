@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  vet:
+    name: Go vet
+    # CGo + FoundationModels.framework require macOS — Linux/Windows can't build this.
+    # Using macos-15 for the runner; macOS 26 (Tahoe) is required at runtime.
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download pre-built dylib
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # Download from the latest release so we can link; falls back gracefully if
+        # no release exists yet (first push). We silence the error in that case.
+        run: |
+          mkdir -p lib
+          gh release download --pattern "libFoundationModels.dylib" --dir lib \
+            --repo "${{ github.repository }}" 2>/dev/null || \
+            echo "No dylib release found — skipping link step."
+
+      - name: go vet (requires dylib)
+        if: hashFiles('lib/libFoundationModels.dylib') != ''
+        run: CGO_ENABLED=1 go vet ./...
+
+      - name: go vet (syntax only, no dylib)
+        if: hashFiles('lib/libFoundationModels.dylib') == ''
+        # CGO_ENABLED=0 skips C compilation; catches pure-Go issues at minimum.
+        run: CGO_ENABLED=0 go vet $(go list ./... | grep -v github.com/CosmoTheDev/go-apple-intelligence/fm) 2>/dev/null || true

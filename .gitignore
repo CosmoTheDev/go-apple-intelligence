@@ -1,0 +1,14 @@
+# Compiled dylib — build with `make build-native` or download with `make download-native`
+lib/
+
+# Swift build artifacts
+foundation-models-c/.build/
+foundation-models-c/*.resolved
+
+# Go build cache
+*.test
+*.out
+
+# macOS
+.DS_Store
+reference/
