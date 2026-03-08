@@ -171,6 +171,84 @@ system-wide (`make install-dylib`) or set `DYLD_LIBRARY_PATH`:
 DYLD_LIBRARY_PATH=$(pwd)/lib CGO_ENABLED=1 go run ./example/chat/
 ```
 
+### Sample output
+
+**`make run-chat`** — multi-turn conversation:
+```
+$ make run-chat
+Apple Intelligence is available.
+
+Q: What is Go?
+A: Go is an open-source programming language developed by Google, designed for
+   simplicity, efficiency, and strong concurrency support. It compiles to native
+   machine code and is widely used for backend services, CLIs, and cloud tooling.
+
+Q: Who made it?
+A: Go was created by Robert Griesemer, Rob Pike, and Ken Thompson at Google,
+   and first released publicly in 2009.
+```
+
+**`make run-stream`** — tokens appear in real time as the model generates them:
+```
+$ make run-stream
+Apple Intelligence is available.
+Streaming: The Go programming language, often called Golang, was designed with
+three goals in mind: simplicity, reliability, and efficiency...
+```
+
+**`make run-structured`** — schema-guided JSON output:
+```
+$ make run-structured
+Apple Intelligence is available.
+Title:     Quick Tomato Pasta
+Desc:      A fast and simple pasta dish with fresh tomatoes and basil.
+Prep:      15 min
+Full JSON: {"title":"Quick Tomato Pasta","description":"A fast and simple pasta
+            dish with fresh tomatoes and basil.","prepTimeMinutes":15}
+```
+
+**`make run-tools`** — the model calls a Go function mid-generation:
+```
+$ make run-tools
+Apple Intelligence is available.
+The current weather in San Francisco is 72°F and sunny.
+```
+
+**`make run-chatbot`** — interactive REPL with context tracking:
+```
+$ make run-chatbot
+Apple Intelligence Chatbot
+Commands: "reset" to clear history, "quit" or Ctrl-C to exit
+────────────────────────────────────────
+
+You: Hello!
+AI:  Hello! How can I help you today?
+     [context: ~312 chars / ~78 tokens]
+
+You: What is 3 times 9?
+AI:  3 times 9 is 27.
+     [context: ~891 chars / ~222 tokens]
+
+You: Now multiply that by 2.
+AI:  27 multiplied by 2 is 54.
+     [context: ~1124 chars / ~281 tokens]
+```
+
+**`make run-chatbot-with-memory`** — same REPL, but conversation history survives restarts:
+```
+$ make run-chatbot-with-memory
+Apple Intelligence Chatbot  (with memory)
+Memory file: ~/.apple-intelligence-memory.json
+Remembered exchanges: 6
+Commands: "reset", "forget", "memory", "quit"
+────────────────────────────────────────
+
+You: What did we talk about last time?
+AI:  Last time we discussed the Go programming language and did some math —
+     you asked about 3×9 and then doubled the result to get 54.
+     [context: ~1843 chars / ~460 tokens | memory: 7 exchanges]
+```
+
 ---
 
 ## API overview
