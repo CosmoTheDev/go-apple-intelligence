@@ -11,17 +11,19 @@ permissions:
 jobs:
   build-dylib:
     name: Build and publish dylib
-    # Requires macOS 26 (Tahoe) with Xcode 26 for FoundationModels framework.
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode 26
         run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Build Foundation Models dylib
         run: make build-native
+
+      - name: Strip debug symbols and build paths from dylib
+        run: strip -x lib/libFoundationModels.dylib
 
       - name: Upload dylib to release
         uses: softprops/action-gh-release@v2
